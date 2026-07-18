@@ -35,15 +35,18 @@ make install-migrate
 # 1. Configure environment
 cp .env.example .env          # then edit DB creds + JWT_SECRET
 
-# 2. Create the database (once), then run migrations
-#    createdb umsrms   # or via your Postgres client
-make migrate-up               # applies schema + seeds roles & categories
+# 2. Create the database (once)
+#    createdb umsrms          # or via your Postgres client
 
-# 3. Run
+# 3. Run — migrations are applied automatically on startup
 make dev                      # live reload (air)
 # or
 make run                      # run once
 ```
+
+> **Migrations run automatically on boot** (embedded in the binary via `//go:embed`).
+> Set `RUN_MIGRATIONS=false` to disable, or apply them manually with `make migrate-up`.
+> The app only needs the database to *exist* — it creates the schema itself.
 
 The API serves on `http://localhost:8080`, base path **`/api/v1`**.
 Swagger UI: **http://localhost:8080/swagger/index.html**

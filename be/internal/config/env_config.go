@@ -27,6 +27,9 @@ type EnvConfig struct {
 	DBName         string
 	DBSSLMode      string
 
+	// Run embedded DB migrations on startup
+	RunMigrations bool
+
 	// CORS
 	CORSAllowedOrigins []string
 
@@ -55,6 +58,7 @@ func LoadEnvConfig() (*EnvConfig, error) {
 		DBPassword:         getEnv("DB_PASSWORD", "postgres"),
 		DBName:             getEnv("DB_NAME", "umsrms"),
 		DBSSLMode:          getEnv("DB_SSLMODE", "disable"),
+		RunMigrations:      getEnvAsBool("RUN_MIGRATIONS", true),
 		CORSAllowedOrigins: getEnvAsSlice("CORS_ALLOWED_ORIGINS", []string{"*"}),
 
 		RateLimitEnabled: getEnvAsBool("RATE_LIMIT_ENABLED", true),

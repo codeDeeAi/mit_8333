@@ -58,6 +58,13 @@ func main() {
 	}
 	defer db.Close()
 
+	if cfg.RunMigrations {
+		if err := config.RunMigrations(db, migrationsFS); err != nil {
+			log.Fatalf("failed to run migrations: %v", err)
+		}
+		log.Printf("database migrations applied")
+	}
+
 	roleRepo := repository.NewRoleRepository(db)
 	if *seedOnStartup {
 		insertedCount, err := roleRepo.SeedDefaultRoles(context.Background())

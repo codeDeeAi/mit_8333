@@ -39,9 +39,9 @@ Each package has its own README with detailed setup:
 ```sh
 cd be
 cp .env.example .env            # edit DB creds + JWT_SECRET
-make install-migrate            # one-time (installs migrate w/ postgres driver)
-make migrate-up                 # schema + seed roles & categories
-make dev                        # http://localhost:8080  (Swagger at /swagger/index.html)
+createdb umsrms                 # create the (empty) database once
+make dev                        # migrations run automatically on boot
+                                # http://localhost:8080  (Swagger at /swagger/index.html)
 ```
 
 ### 2. Frontend
