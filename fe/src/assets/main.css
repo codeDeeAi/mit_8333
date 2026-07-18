@@ -1,0 +1,80 @@
+@import 'tailwindcss';
+@import 'vue3-toastify/dist/index.css';
+
+/*
+ * Vercel-style dark design system.
+ * Palette is intentionally neutral (near-black surfaces, subtle borders,
+ * a single blue accent) to mirror the Geist / Vercel aesthetic.
+ */
+@theme {
+  --color-bg: #000000;
+  --color-surface: #0a0a0a;
+  --color-surface-2: #111111;
+  --color-elevated: #161616;
+  --color-border: #1f1f1f;
+  --color-border-strong: #2e2e2e;
+
+  --color-fg: #ededed;
+  --color-muted: #a1a1a1;
+  --color-subtle: #6f6f6f;
+
+  --color-accent: #0070f3;
+  --color-accent-hover: #338df5;
+  --color-success: #0cce6b;
+  --color-warning: #f5a623;
+  --color-danger: #e5484d;
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  --radius-lg: 0.75rem;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Thin, dark scrollbars to match the theme. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 999px;
+}
+
+/* Subtle radial glow used behind auth / hero sections. */
+.bg-grid-glow {
+  background-image:
+    radial-gradient(60rem 60rem at 50% -20%, rgba(0, 112, 243, 0.12), transparent 60%),
+    linear-gradient(to bottom, var(--color-bg), var(--color-bg));
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease both;
+}

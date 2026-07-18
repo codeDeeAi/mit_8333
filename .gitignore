@@ -1,0 +1,76 @@
+# ── OS ─────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ── Editors / IDEs ─────────────────────────────────────────────────
+.idea/
+*.swp
+*.swo
+*~
+# Keep shared VS Code settings but ignore user-local ones
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# ── Environment / secrets ──────────────────────────────────────────
+# Never commit real secrets. .env.example files are kept.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── Logs ───────────────────────────────────────────────────────────
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ═══════════════════════ Backend (Go — /be) ═══════════════════════
+# Compiled binaries / build output
+be/main
+be/bin/
+be/build/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+# Go test / profiling artifacts
+*.test
+*.out
+# Air live-reload working dir
+be/tmp/
+# Uploaded evidence files (runtime data)
+be/uploads/*
+!be/uploads/.gitkeep
+
+# ═══════════════════════ Frontend (Vue/Vite — /fe) ════════════════
+node_modules/
+fe/node_modules/
+dist/
+dist-ssr/
+fe/dist/
+*.local
+.vite/
+# Vitest / coverage
+coverage/
+*.lcov
+# TypeScript build info
+*.tsbuildinfo
+fe/node_modules/.tmp/
+
+# ── Misc ───────────────────────────────────────────────────────────
+.cache/
+tmp/
+temp/
+
+IMPLEMENTATION.md

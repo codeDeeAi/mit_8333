@@ -1,0 +1,1003 @@
+basePath: /api/v1
+definitions:
+  dto.AssignServiceRequestRequest:
+    properties:
+      officer_id:
+        type: integer
+    required:
+    - officer_id
+    type: object
+  dto.AuditLogResponse:
+    properties:
+      action:
+        type: string
+      created_at:
+        type: string
+      entity:
+        type: string
+      entity_id:
+        type: string
+      id:
+        type: integer
+      user_id:
+        type: integer
+      user_name:
+        type: string
+    type: object
+  dto.AuthResponse:
+    properties:
+      expires_at:
+        type: string
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserResponse'
+    type: object
+  dto.CategoryCountResponse:
+    properties:
+      count:
+        type: integer
+      name:
+        type: string
+    type: object
+  dto.CategoryResponse:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        maxLength: 72
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.NotificationResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_read:
+        type: boolean
+      message:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  dto.PaginationMeta:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.RegisterRequest:
+    properties:
+      email:
+        type: string
+      full_name:
+        maxLength: 150
+        minLength: 2
+        type: string
+      password:
+        maxLength: 72
+        minLength: 6
+        type: string
+      phone:
+        maxLength: 30
+        type: string
+      role_id:
+        type: integer
+    required:
+    - email
+    - full_name
+    - password
+    type: object
+  dto.RegistrationDataResponse:
+    properties:
+      roles:
+        items:
+          $ref: '#/definitions/dto.RoleResponse'
+        type: array
+    type: object
+  dto.ReportSummaryResponse:
+    properties:
+      by_category:
+        items:
+          $ref: '#/definitions/dto.CategoryCountResponse'
+        type: array
+      by_status:
+        additionalProperties:
+          format: int64
+          type: integer
+        type: object
+      total:
+        type: integer
+    type: object
+  dto.RoleResponse:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  dto.ServiceRequestDetailResponse:
+    properties:
+      request:
+        $ref: '#/definitions/dto.ServiceRequestResponse'
+      status_logs:
+        items:
+          $ref: '#/definitions/dto.StatusLogResponse'
+        type: array
+    type: object
+  dto.ServiceRequestListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.ServiceRequestResponse'
+        type: array
+      pagination:
+        $ref: '#/definitions/dto.PaginationMeta'
+    type: object
+  dto.ServiceRequestResponse:
+    properties:
+      assigned_officer_id:
+        type: integer
+      assigned_officer_name:
+        type: string
+      category_id:
+        type: integer
+      category_name:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      created_by_name:
+        type: string
+      description:
+        type: string
+      evidence_path:
+        type: string
+      id:
+        type: integer
+      location:
+        type: string
+      priority:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.StatusLogResponse:
+    properties:
+      changed_by:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      new_status:
+        type: string
+      note:
+        type: string
+      old_status:
+        type: string
+      request_id:
+        type: integer
+    type: object
+  dto.UpdateServiceRequestStatusRequest:
+    properties:
+      note:
+        maxLength: 1000
+        type: string
+      status:
+        enum:
+        - pending
+        - assigned
+        - in_progress
+        - completed
+        - rejected
+        type: string
+    required:
+    - status
+    type: object
+  dto.UpdateUserRoleRequest:
+    properties:
+      role:
+        enum:
+        - student_staff
+        - maintenance_officer
+        - admin
+        type: string
+    required:
+    - role
+    type: object
+  dto.UserResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: integer
+      phone:
+        type: string
+      role:
+        type: string
+      role_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  utils.APIResponse:
+    properties:
+      data: {}
+      error: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+info:
+  contact: {}
+  description: API documentation for the University Maintenance & Service Request
+    Management System.
+  title: University Maintenance Service API
+  version: "1.0"
+paths:
+  /audit-logs:
+    get:
+      description: Admins view the activity/audit trail of key actions.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.AuditLogResponse'
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List audit log
+      tags:
+      - audit
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and returns an auth token.
+      parameters:
+      - description: Login payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AuthResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+      summary: Log in
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: Revokes the current bearer token so it can no longer be used.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Log out
+      tags:
+      - auth
+  /auth/me:
+    get:
+      description: Returns the authenticated user's profile.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Current user
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Creates a student/staff account and returns an auth token.
+      parameters:
+      - description: Registration payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AuthResponse'
+              type: object
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+      summary: Register a new user
+      tags:
+      - auth
+  /auth/registration-data:
+    get:
+      description: Returns reference data for the sign-up screen, including roles.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.RegistrationDataResponse'
+              type: object
+      summary: Registration reference data
+      tags:
+      - auth
+  /categories:
+    get:
+      description: Returns the maintenance request categories used by the create form.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.CategoryResponse'
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List request categories
+      tags:
+      - categories
+  /notifications:
+    get:
+      description: Returns the authenticated user's in-app notifications.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.NotificationResponse'
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List notifications
+      tags:
+      - notifications
+  /notifications/{id}/read:
+    put:
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Mark a notification read
+      tags:
+      - notifications
+  /notifications/read-all:
+    put:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Mark all notifications read
+      tags:
+      - notifications
+  /ping:
+    get:
+      description: Returns pong if service is running
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - health
+  /reports/summary:
+    get:
+      description: Admin dashboard totals and counts by status and category.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ReportSummaryResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Reports summary
+      tags:
+      - reports
+  /requests:
+    get:
+      description: Returns requests scoped to the caller's role, with search, filter
+        and pagination.
+      parameters:
+      - description: Search text
+        in: query
+        name: q
+        type: string
+      - description: Status
+        enum:
+        - pending
+        - assigned
+        - in_progress
+        - completed
+        - rejected
+        in: query
+        name: status
+        type: string
+      - description: Category ID
+        in: query
+        name: category_id
+        type: integer
+      - description: Priority
+        enum:
+        - low
+        - medium
+        - high
+        in: query
+        name: priority
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Sort, e.g. created_at.desc
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServiceRequestListResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List service requests
+      tags:
+      - requests
+    post:
+      consumes:
+      - multipart/form-data
+      description: Student/staff submit a maintenance request, optionally with an
+        evidence file.
+      parameters:
+      - description: Title
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: Description
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: Category ID
+        in: formData
+        name: category_id
+        required: true
+        type: integer
+      - description: Location
+        in: formData
+        name: location
+        required: true
+        type: string
+      - description: Priority
+        enum:
+        - low
+        - medium
+        - high
+        in: formData
+        name: priority
+        type: string
+      - description: Evidence file (image or PDF)
+        in: formData
+        name: evidence
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServiceRequestResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a service request
+      tags:
+      - requests
+  /requests/{id}:
+    delete:
+      description: Admins delete a request and its evidence.
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a service request
+      tags:
+      - requests
+    get:
+      description: Returns a request with its status history (access scoped by role).
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServiceRequestDetailResponse'
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get a service request
+      tags:
+      - requests
+  /requests/{id}/assign:
+    post:
+      consumes:
+      - application/json
+      description: Admins assign a service request to a maintenance officer.
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Officer to assign
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AssignServiceRequestRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServiceRequestResponse'
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Assign a request to an officer
+      tags:
+      - requests
+  /requests/{id}/evidence:
+    post:
+      consumes:
+      - multipart/form-data
+      description: The request owner attaches or replaces the evidence file.
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Evidence file (image or PDF)
+        in: formData
+        name: evidence
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServiceRequestResponse'
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Upload request evidence
+      tags:
+      - requests
+  /requests/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Maintenance officers (assigned) or admins move a request through
+        its lifecycle.
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Status update
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateServiceRequestStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServiceRequestResponse'
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Update request status
+      tags:
+      - requests
+  /users:
+    get:
+      description: Admins list all users, optionally filtered by role.
+      parameters:
+      - description: Filter by role
+        enum:
+        - student_staff
+        - maintenance_officer
+        - admin
+        in: query
+        name: role
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.UserResponse'
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List users
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a user
+      tags:
+      - users
+  /users/{id}/role:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: New role
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUserRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserResponse'
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/utils.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a user's role
+      tags:
+      - users
+  /users/officers:
+    get:
+      description: Returns users with the maintenance officer role (for assignment).
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.UserResponse'
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List maintenance officers
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and the JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
