@@ -16,12 +16,9 @@ const router = useRouter()
 
 const roles = ref<RoleOption[]>([])
 const rolesLoading = ref(true)
-const SELF_REGISTRATION_ROLES: Role[] = ['student_staff']
 
 const roleOptions = computed(() =>
-  roles.value
-    .filter((role) => SELF_REGISTRATION_ROLES.includes(role.name as Role))
-    .map((role) => ({ value: role.id, label: ROLE_LABELS[role.name as Role] ?? role.name })),
+  roles.value.map((role) => ({ value: role.id, label: ROLE_LABELS[role.name as Role] ?? role.name })),
 )
 
 onMounted(async () => {
